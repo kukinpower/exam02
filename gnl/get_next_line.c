@@ -27,7 +27,7 @@ void	allocate_first_time(char **line)
 
 int		ft_free_exit(int code, char **line)
 {
-	if (*remainder)
+	if (remainder)
 	{
 		free(remainder);
 	}
@@ -40,7 +40,23 @@ int		ft_free_exit(int code, char **line)
 
 void	append_buf(char *buf, char **line)
 {
-	
+	char *tmp;
+	int		i;
+	int		j;
+
+	i = 0;
+	j = 0;
+
+	tmp = malloc(ft_strlen(remainder) + 2);
+	while (remainder[i])
+	{
+		tmp[i] = remainder[i];
+		i++;
+	}
+	tmp[i] = buf[0];
+	tmp[i + 1] = '\0';
+	free(remainder);
+	remainder = tmp;
 }
 
 int	get_next_line(char **line)
@@ -49,13 +65,22 @@ int	get_next_line(char **line)
 	int		count;
 
 	count = 0;
+	buf[1] = '\0';
 	allocate_first_time(line);
 
 	while ((count = read(0, buf, 1)) > 0)
 	{
-		buf[1] = '\0';
+		if (buf[0] == '\n')
+			return (1);
 		append_buf(buf, line);
 	}
 	if (count < 0)
 		ft_free_exit(-1, line);
+	else if (count == 0)
+	{
+		if (buf[0] != '\n')
+			append_buf(buf, line);
+		else
+			return (0);
+	}
 }
