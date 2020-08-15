@@ -1,193 +1,206 @@
-#include <stdlib.h>
 #include <unistd.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 #include <stdio.h>
 
-
-int     precision;
-int     width;
-int     count;
-int     i;
-char    *format;
+char *f;
+int i;
+int width;
+int precision;
+int minus;
+int dot;
 va_list ap;
-int     minus;
+int count = 0;
+char *toprint = NULL;
 
-void    init_vars()
+void init()
 {
-    minus = 0;
-    
-    count = 0;
+    if (toprint)
+        toprint = NULL;
     width = 0;
     precision = 0;
-}
-
-int     ft_isdigit(char c)
-{
-    return (c >= '0' && c <= '9');
+    minus = 0;
+	dot = 0;
 }
 
 int     ft_strlen(char *str)
 {
-    int k;
+    int i = 0;
 
-    k = 0;
-    while (str[k])
-    {
-        k++;
-    }
-    return (k);
-}
-
-int     cout_num_len(int num, int base)
-{
-    int j;
-
-    j = 0;
-    while (num / base > 0)
-    {
-        num /= base;
-        j++;
-    }
-    return (j);
-}
-
-char    *ft_itoa_base(long long int n, int base)
-{
-    char *s;
-    int len = cout_num_len(n, base);
-    char tab[] = "0123456789ABCDEF";
-
-    
-    s = malloc(len + 1);
-	s[len--] = '\0';
-    while (n / base > 0)
-    {
-        s[len] = tab[n % base];
-		n /= base;
-		len--;
-    }
-    return (s);
-}
-
-
-void    handle_number()
-{
-	int 	k = 0;
-    int base;
-    long int num;
-    char *str_num;
-
-    base = 0;
-    num = 0;
-    if (format[i] == 'd')
-    {
-        num = va_arg(ap, int);
-        if (num < 0)
-        {
-            num = -num;
-            minus = 1;
-        }
-        base = 10;
-    }
-    else if (format[i] == 'x')
-    {
-        num = va_arg(ap, unsigned int);
-        base = 16;
-    }
-    str_num = ft_itoa_base(num, base);
-	if (width > ft_strlen(str_num) + minus)
-	{
-		while (k < width - (ft_strlen(str_num) + minus))
-		{
-			count += write(1, " ", 1);
-			k++;
-		}
-		if (minus)
-			count += write(1, "-", 1);
-		count += write(1, str_num, ft_strlen(str_num));
-	}
-    else if (precision > ft_strlen(str_num) + minus)
-	{
-		while (k < width - (ft_strlen(str_num) + minus))
-		{
-			count += write(1, " ", 1);
-			k++;
-		}
-		if (minus)
-			count += write(1, "-", 1);
-		count += write(1, str_num, ft_strlen(str_num));
-	}
-}
-
-void    handle_spec()
-{
-    if (format[i] == '%')
-        count += write(1, &format[i], 1);
-    else if (ft_isdigit(format[i]) && !width && !precision)
-    {
-        while (ft_isdigit(format[i]))
-        {
-            width = width * 10 + format[i] - '0';
-            i++;
-            if (format[i] == '.')
-            {
-                while (ft_isdigit(format[i]))
-                {
-                    precision = precision * 10 + format[i] - '0';
-                    i++;
-                }
-                break ;
-            }
-        }
-    }
-    else if (format[i] == '.' && !precision)
-    {
+    while (str[i])
         i++;
-        while (ft_isdigit(format[i]))
-        {
-            precision = precision * 10 + format[i] - '0';
-            i++;
-        }
-    }
-    else if (format[i] == 'd' || format[i] == 'x')
-    {
-        handle_number();
-    }
+    return (i);
+}
+
+int		intlen(long long int n, int b)
+{
+	int j = 0;
+
+	while (n / b > 0)
+	{
+		j++;
+		n /= b;
+	}
+	j++;
+	return (j);
+}
+
+char *ft_itoa_base(long long int num, int base)
+{
+	char *str;
+	
+	if (num == 0)
+	{
+		str = malloc(2);
+		str[0] = '0';
+		str[1] = '\0';
+	}
+	if (num < 0)
+	{
+		num = -num;
+		minus = 1;
+	}
+	char tab[] = "0123456789abcdef";
+	int len = intlen(num, base);
+	str = malloc(len + 1);
+	str[len] = '\0';
+	len--;
+	while (num / base > 0)
+	{
+		str[len--] = tab[num % base];
+		num /= base;
+	}
+	str[len] = tab[num % base];
+	return (str);
+}
+
+_Bool	ft_isdigit(char c)
+{
+	return (c >= '0' && c <= '9');
+}
+
+int	ft_atoi()
+{
+	int n = 0;
+
+	while (ft_isdigit(f[i]))
+	{
+		n = n * 10 + (f[i] - '0');
+		i++;
+	}
+	return (n);
+}
+
+void handle_specs()
+{
+	if (ft_isdigit(f[i]))
+	{
+		width = ft_atoi();
+		if (f[i] == '.' && !dot)
+		{
+			i++;
+			precision = ft_atoi();
+			dot = 1;
+		}
+	}
+	else if (ft_isdigit(f[i]) && !dot)
+	{
+		i++;
+		precision = ft_atoi();
+		dot = 1;
+	}
+	printf("[[[[width: %d, precision: %d]]]]]\n", width, precision);
+}
+
+void handle_s()
+{
+	int j = 0;
+	
+	toprint = va_arg(ap, char *);
+	if (dot && precision < ft_strlen(toprint))
+	{
+		while (width > ft_strlen(toprint) - precision)
+		{
+			count += write(1, " ", 1);
+			width--;
+		}
+		while (j < precision)
+		{
+			count += write(1, &toprint[j], 1);
+			j++;
+		}
+	}
+	else if (width > ft_strlen(toprint))
+	{
+		while (width > ft_strlen(toprint))
+		{
+			count += write(1, " ", 1);
+			width--;
+		}
+		count += write(1, toprint, ft_strlen(toprint));
+	}
+	else
+	{
+		count += write(1, toprint, ft_strlen(toprint));
+	}
+	i++;
+}
+
+void handle_type()
+{
+	
+
+	if (f[i] == '%')
+	{
+		count += write(1, "%", 1);
+		i++;
+	}	
+	else if (f[i] == 'd')
+	{
+		toprint = ft_itoa_base(va_arg(ap, int), 10);
+		if (minus)
+		{
+			count += write(1, "-", 1);
+		}
+		count += write(1, toprint, ft_strlen(toprint));
+		i++;
+	}
+	else if (f[i] == 'x')
+	{
+		toprint = ft_itoa_base(va_arg(ap, long long int), 16);
+		count += write(1, toprint, ft_strlen(toprint));
+		i++;
+	}
+	else if (f[i] == 's')
+	{
+		handle_s();
+	}
 }
 
 int ft_printf(const char *fmt, ... )
 {
-    format = fmt;
-    init_vars();
-    i = 0;
-    va_start(ap, format);
-    while (format[i])
+    f = (char *)fmt;
+    va_start(ap, fmt);
+	init();
+	count = 0;
+	i = 0;
+    while (f[i])
     {
-        if (format[i] == '%')
+        if (f[i] == '%')
         {
-            i++;
-            handle_spec(format + i);
+			i++;
+			if (ft_isdigit(f[i]) || f[i] == '.')
+            	handle_specs();
+			handle_type();
         }
         else
         {
-            count += write(1, &format[i], 1);
+            count += write(1, &f[i], 1);
             i++;
         }
     }
     va_end(ap);
-	return (count);
-}
-
-int     main()
-{
-    int f;
-    int p;
-
-    printf("-----------------------INTEGERS-----------------------\n\n\n");
-    f = ft_printf("%d", 12345678);
-	printf("\n");
-    p = printf("%d", 12345678);
-	printf("\n");
-    printf("ft_printf: %d, printf: %d\n", f, p);
+	
+    return (count);
 }
