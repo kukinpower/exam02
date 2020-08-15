@@ -43,35 +43,44 @@ int		intlen(long long int n, int b)
 		n /= b;
 	}
 	j++;
-	return (j);
+	return (j > precision ? j : precision);
 }
 
 char *ft_itoa_base(long long int num, int base)
 {
 	char *str;
-	
-	if (num == 0)
-	{
-		str = malloc(2);
-		str[0] = '0';
-		str[1] = '\0';
-	}
+	int k = 0;
+	int len = 0;
+
 	if (num < 0)
 	{
 		num = -num;
 		minus = 1;
 	}
-	char tab[] = "0123456789abcdef";
-	int len = intlen(num, base);
+	if (num == 0 && !precision && dot)
+		len = 0;
+	else
+		len = intlen(num, base);
 	str = malloc(len + 1);
+	while (k < len)
+	{
+		str[k] = '0';
+		k++;
+	}
+	if (!(len > 0) && num == 0)
+	{
+		str = malloc(2);
+		str[0] = '0';
+		str[1] = '\0';
+	}
 	str[len] = '\0';
 	len--;
 	while (num / base > 0)
 	{
-		str[len--] = tab[num % base];
+		str[len--] = "0123456789abcdef"[num % base];
 		num /= base;
 	}
-	str[len] = tab[num % base];
+	str[len] = "0123456789abcdef"[num % base];
 	return (str);
 }
 
@@ -110,7 +119,15 @@ void handle_specs()
 		precision = ft_atoi();
 		dot = 1;
 	}
-	printf("[[[[width: %d, precision: %d]]]]]\n", width, precision);
+	else if (f[i] == '.' && !dot && !precision)
+	{
+		i++;
+		dot = 1;
+		if (ft_isdigit(f[i]))
+		{
+			precision = ft_atoi();
+		}
+	}
 }
 
 void handle_s()
@@ -120,15 +137,26 @@ void handle_s()
 	toprint = va_arg(ap, char *);
 	if (dot && precision < ft_strlen(toprint))
 	{
-		while (width > ft_strlen(toprint) - precision)
+		if (precision)
 		{
-			count += write(1, " ", 1);
-			width--;
+			while (width > ft_strlen(toprint) - precision)
+			{
+				count += write(1, " ", 1);
+				width--;
+			}
+			while (j < precision)
+			{
+				count += write(1, &toprint[j], 1);
+				j++;
+			}
 		}
-		while (j < precision)
+		if (!precision)
 		{
-			count += write(1, &toprint[j], 1);
-			j++;
+			while (width > 0)
+			{
+				count += write(1, " ", 1);
+				width--;
+			}
 		}
 	}
 	else if (width > ft_strlen(toprint))
@@ -147,10 +175,40 @@ void handle_s()
 	i++;
 }
 
+void handle_d()
+{
+	toprint = ft_itoa_base(va_arg(ap, int), 10);
+	if (width > ft_strlen(toprint))
+	{
+		while (width-- > ft_strlen(toprint) + minus)
+		{
+			count += write(1, " ", 1);
+		}
+	}
+	if (minus)
+	{
+		count += write(1, "-", 1);
+	}
+	count += write(1, toprint, ft_strlen(toprint));
+	i++;
+}
+
+void handle_x()
+{
+	toprint = ft_itoa_base(va_arg(ap, long long int), 16);
+	if (width > ft_strlen(toprint))
+	{
+		while (width-- > ft_strlen(toprint))
+		{
+			count += write(1, " ", 1);
+		}
+	}
+	count += write(1, toprint, ft_strlen(toprint));
+	i++;
+}
+
 void handle_type()
 {
-	
-
 	if (f[i] == '%')
 	{
 		count += write(1, "%", 1);
@@ -158,19 +216,12 @@ void handle_type()
 	}	
 	else if (f[i] == 'd')
 	{
-		toprint = ft_itoa_base(va_arg(ap, int), 10);
-		if (minus)
-		{
-			count += write(1, "-", 1);
-		}
-		count += write(1, toprint, ft_strlen(toprint));
-		i++;
+		handle_d();
 	}
 	else if (f[i] == 'x')
 	{
-		toprint = ft_itoa_base(va_arg(ap, long long int), 16);
-		count += write(1, toprint, ft_strlen(toprint));
-		i++;
+		
+		handle_x();
 	}
 	else if (f[i] == 's')
 	{
