@@ -9,7 +9,7 @@ int     main(int ac, char **av)
     {
         while (av[1][i])
         {
-            if (av[1][i] && !tab[(unsigned char)av[1][i]])
+            if (!tab[(unsigned char)av[1][i]])
             {
                 tab[(unsigned char)av[1][i]] = 1;
                 write(1, &av[1][i], 1);
@@ -19,7 +19,7 @@ int     main(int ac, char **av)
         i = 0;
         while (av[2][i])
         {
-            if (av[2][i] && !tab[(unsigned char)av[2][i]])
+            if (!tab[(unsigned char)av[2][i]])
             {
                 tab[(unsigned char)av[2][i]] = 1;
                 write(1, &av[2][i], 1);

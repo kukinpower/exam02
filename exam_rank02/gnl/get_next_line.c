@@ -2,13 +2,10 @@
 
 int     ft_strlen(char *str)
 {
-    int i;
+    int i = 0;
 
-    i = 0;
     while (str[i])
-    {
         i++;
-    }
     return (i);
 }
 
@@ -30,10 +27,10 @@ void    append_buf(char **line, char *buf)
     *line = tmp;
 }
 
-int get_next_line(char **line)
+int			get_next_line(char **line)
 {
-    char buf[2];
-    int     bytes;
+    char	buf[2];
+    int		bytes;
     
     buf[1] = '\0';
     *line = malloc(1);
