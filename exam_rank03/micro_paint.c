@@ -8,6 +8,16 @@ float x, y, w, h;
 char color, type;
 FILE    *fileptr;
 
+int     is_hit(float i, float j)
+{
+    if (i < x || i > x + w || j < y || j > y + h)
+        return (0);
+    else if (i - x < 1 || x + w - i < 1 || j - y < 1 || y + h - j < 1)
+        return (2);
+    else
+        return (1);
+}
+
 void    draw()
 {
     int i = 0;
