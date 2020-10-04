@@ -32,7 +32,9 @@ void    draw()
             hit = is_hit((float)i, (float)j);
             if (hit == 2 || (hit == 1 && type == 'R'))
                 artboard[i + j * width] = color;
+            j++;
         }
+        i++;
     }
 }
 
@@ -58,6 +60,18 @@ _Bool   get_zone()
     if (res != -1)
         return (1);
     return (0);
+}
+
+void    print_artboard()
+{
+    int i = 0;
+
+    while (i < height)
+    {
+        write(1, artboard + i * width, width);
+        write(1, "\n", 1);
+        i++;
+    }
 }
 
 int     main(int ac, char **av)
