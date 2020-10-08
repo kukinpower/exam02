@@ -4,12 +4,12 @@
 
 ## My solutions
 ### Level 1
-1. [inter](https://github.com/kukinpower/exam02/blob/master/inter/inter.c)
-2. [union](https://github.com/kukinpower/exam02/tree/master/union/union.c)
+1. [inter](https://github.com/kukinpower/exam_ranks/blob/master/exam_rank02/inter/inter.c)
+2. [union](https://github.com/kukinpower/exam_ranks/blob/master/exam_rank02/union/union.c)
 
 ### Level 2
-1. [get_next_line](https://github.com/kukinpower/exam02/tree/master/gnl)
-2. [ft_printf](https://github.com/kukinpower/exam02/tree/master/ft_printf)
+1. [get_next_line](https://github.com/kukinpower/exam_ranks/blob/master/exam_rank02/gnl/get_next_line.c)
+2. [ft_printf](https://github.com/kukinpower/exam_ranks/blob/master/exam_rank02/ft_printf/ft_printf.c)
 
 
 ## Advice part
